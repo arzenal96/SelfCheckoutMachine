@@ -21,28 +21,28 @@ namespace SelfCheckoutMachine.Controllers
         }
 
         [HttpGet]
-        public JsonResult Get([FromBody] JsonElement body)
+        public ObjectResult Get([FromBody] JsonElement body)
         {
             JsonElement inserted;
 
-            var jsonResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
-            if (jsonResult != null)
+            var objectResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
+            if (objectResult != null)
             {
-                return jsonResult;
+                return objectResult;
             }
 
-            return new JsonResult(new { StatusCode = 200, Value =  body.GetProperty("inserted") });
+            return new ObjectResult(new { StatusCode = 200, Value =  body.GetProperty("inserted") });
         }
 
         [HttpPost]
-        public JsonResult Post([FromBody] JsonElement body)
+        public ObjectResult Post([FromBody] JsonElement body)
         {
             JsonElement inserted;
 
-            var jsonResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
-            if (jsonResult != null)
+            var objectResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
+            if (objectResult != null)
             {
-                return jsonResult;
+                return objectResult;
             }
 
             foreach (var bill in inserted.EnumerateObject())
@@ -69,7 +69,7 @@ namespace SelfCheckoutMachine.Controllers
                 _context.SaveChanges();
             }
 
-            return new JsonResult(new { StatusCode = 200, Value = body.GetProperty("inserted") });
+            return new ObjectResult(new { StatusCode = 200, Value = body.GetProperty("inserted") });
         }
     }
 }
