@@ -7,3 +7,5 @@ Once you have the SqlServer instance, all you need to do is to run the following
 It will generate the required database with the given tables and it will also populate the Bill table with the accepted currencies.
 
 The logging is using the application's console. You can check it in the Output window of Visual Studio by selecting "SelfCheckoutMachine - ASP.NET Core Web Server" from the "Show output from" dropdown.
+
+The webserver listens on the 44390 port of the localhost.
