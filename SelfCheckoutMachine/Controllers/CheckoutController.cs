@@ -18,16 +18,10 @@ namespace SelfCheckoutMachine.Controllers
             _context = Context;
         }
 
-        [HttpGet]
-        public IEnumerable<Checkout> Get()
-        {
-            throw new NotImplementedException();
-        }
-
         [HttpPost]
         public IEnumerable<Checkout> Post([FromBody] JsonElement body)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

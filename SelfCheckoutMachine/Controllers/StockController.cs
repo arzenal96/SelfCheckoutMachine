@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SelfCheckoutMachine.Entities;
 using SelfCheckoutMachine.Migrations;
+using SelfCheckoutMachine.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace SelfCheckoutMachine.Controllers
         {
             JsonElement inserted;
 
-            var jsonResult = ErrorHandler(body, out inserted);
+            var jsonResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
             if (jsonResult != null)
             {
                 return jsonResult;
@@ -38,7 +39,7 @@ namespace SelfCheckoutMachine.Controllers
         {
             JsonElement inserted;
 
-            var jsonResult = ErrorHandler(body, out inserted);
+            var jsonResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
             if (jsonResult != null)
             {
                 return jsonResult;
@@ -69,36 +70,6 @@ namespace SelfCheckoutMachine.Controllers
             }
 
             return new JsonResult(new { StatusCode = 200, Value = body.GetProperty("inserted") });
-        }
-
-        private JsonResult ErrorHandler(JsonElement body, out JsonElement inserted)
-        {
-            if (!body.TryGetProperty("inserted", out inserted))
-            {
-                return new JsonResult(new { StatusCode = 422, Value = "Missing request entity: \"inserted\"" });
-            }
-
-            var insertedBills = inserted.EnumerateObject();
-
-            bool billQuantityIsNotAnInteger = insertedBills.Any(ib => !int.TryParse(ib.Value.ToString(), out _));
-            if (billQuantityIsNotAnInteger)
-            {
-                var invalidBills = insertedBills.Where(ib => !int.TryParse(ib.Value.ToString(), out _));
-                var messageParameter = String.Join(',', invalidBills.Select(ib => ib.Name).ToArray());
-
-                return new JsonResult(new { StatusCode = 422, Value = $"The following bills type's value is invalid, it must be a number: {messageParameter}" });
-            }
-
-            bool billIsNotSupported = insertedBills.Any(ib => _context.Bills.All(b => b.BillName != ib.Name));
-            if (billIsNotSupported)
-            {
-                var unsupportedBills = insertedBills.Where(ib => _context.Bills.All(b => b.BillName != ib.Name));
-                var messageParameter = String.Join(',', unsupportedBills.Select(ub => ub.Name).ToArray());
-
-                return new JsonResult(new { StatusCode = 422, Value = $"The following bill type is not supported by the machine: {messageParameter}" });
-            }
-
-            return null;
         }
     }
 }
