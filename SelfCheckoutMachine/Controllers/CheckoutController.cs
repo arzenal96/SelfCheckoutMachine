@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SelfCheckoutMachine.Entities;
 using SelfCheckoutMachine.Migrations;
-using SelfCheckoutMachine.Models;
 using SelfCheckoutMachine.Utils;
 using System;
 using System.Collections.Generic;
@@ -24,9 +22,11 @@ namespace SelfCheckoutMachine.Controllers
         [HttpPost]
         public ObjectResult Post([FromBody] JsonElement body)
         {
+            Console.WriteLine("/api/v1/Checkout POST");
             JsonElement inserted, price;
 
             var objectResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
+            Console.WriteLine($"Inserted: {inserted}");
 
             if (objectResult != null)
             {
@@ -34,7 +34,7 @@ namespace SelfCheckoutMachine.Controllers
             }
 
             objectResult = MachineUtil.ErrorHandlerForPriceObject(body, out price);
-
+            Console.WriteLine($"Price: {price}");
             if (objectResult != null)
             {
                 return objectResult;
@@ -49,8 +49,12 @@ namespace SelfCheckoutMachine.Controllers
                 paid += billNameIntValue * billAmount;
             }
 
+            Console.WriteLine($"Paid: {paid}");
+
             var remainder = paid - int.Parse(price.ToString());
-            var dict = new Dictionary<string, int>();
+            Console.WriteLine($"Remainder: {remainder}");
+
+            var dictionary = new Dictionary<string, int>();
 
             if (remainder < 0)
             {
@@ -62,47 +66,53 @@ namespace SelfCheckoutMachine.Controllers
             }
             else
             {
-                var availableBills = _context.Stocks.Join(_context.Bills, s => s.BillId, b => b.Id, (s, b) => new
-                { 
-                    s.BillId,
-                    BillValue = Convert.ToInt32(b.BillName),
-                    BillAmount = s.Amount
-                }).OrderByDescending(ab => ab.BillValue);
+                return CalculateRemainder(remainder, dictionary);
+            }
+        }
 
-                var sum = 0;
-                foreach (var bills in availableBills)
-                {
-                    sum += bills.BillValue * bills.BillAmount;
-                }
+        private ObjectResult CalculateRemainder(int remainder, Dictionary<string, int> dictionary)
+        {
+            var availableBills = _context.Stocks.Join(_context.Bills, s => s.BillId, b => b.Id, (s, b) => new
+            {
+                s.BillId,
+                BillValue = Convert.ToInt32(b.BillName),
+                BillAmount = s.Amount
+            }).OrderByDescending(ab => ab.BillValue);
 
-                if (sum < remainder)
-                {
-                    return new ObjectResult("There's not enough money to pay the remainder.") { StatusCode = 400 };
-                }
-                else
-                {
-                    foreach (var bill in availableBills)
-                    {
-                        int wholePart = (int)Math.Floor((double)(remainder / bill.BillValue));
-                        if (wholePart > 0)
-                        {
-                            remainder -= bill.BillValue * wholePart;
-
-                            var stock = _context.Stocks.FirstOrDefault(s => s.BillId == bill.BillId);
-                            stock.Amount -= wholePart;
-
-                            _context.Update(stock);
-
-                            dict.Add(bill.BillValue.ToString(), wholePart);
-                        }
-                    }
-
-                    _context.SaveChanges();
-                }
+            var sum = 0;
+            foreach (var bills in availableBills)
+            {
+                sum += bills.BillValue * bills.BillAmount;
             }
 
-            return new ObjectResult(dict) { StatusCode = 200 };
+            if (sum < remainder)
+            {
+                return new ObjectResult("There's not enough money to pay the remainder.") { StatusCode = 400 };
+            }
+            else
+            {
+                foreach (var bill in availableBills)
+                {
+                    int wholePart = (int)Math.Floor((double)(remainder / bill.BillValue));
+                    if (wholePart > 0)
+                    {
+                        remainder -= bill.BillValue * wholePart;
 
+                        var stock = _context.Stocks.FirstOrDefault(s => s.BillId == bill.BillId);
+                        stock.Amount -= wholePart;
+
+                        _context.Update(stock);
+
+                        dictionary.Add(bill.BillValue.ToString(), wholePart);
+                    }
+                }
+
+                _context.SaveChanges();
+                Console.WriteLine("Data saved!");
+
+                return new ObjectResult(dictionary) { StatusCode = 200 };
+            }
         }
+
     }
 }

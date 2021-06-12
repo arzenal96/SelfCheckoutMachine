@@ -23,9 +23,13 @@ namespace SelfCheckoutMachine.Controllers
         [HttpGet]
         public ObjectResult Get([FromBody] JsonElement body)
         {
+            Console.WriteLine("api/v1/Stock GET");
+
             JsonElement inserted;
 
             var objectResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
+            Console.WriteLine($"Inserted: {inserted}");
+
             if (objectResult != null)
             {
                 return objectResult;
@@ -37,9 +41,13 @@ namespace SelfCheckoutMachine.Controllers
         [HttpPost]
         public ObjectResult Post([FromBody] JsonElement body)
         {
+            Console.WriteLine("api/v1/Stock POST");
+
             JsonElement inserted;
 
             var objectResult = MachineUtil.ErrorHandlerForInsertedObject(body, out inserted, _context);
+            Console.WriteLine($"Inserted: {inserted}");
+
             if (objectResult != null)
             {
                 return objectResult;
@@ -65,8 +73,8 @@ namespace SelfCheckoutMachine.Controllers
                     });
                 }
 
-
                 _context.SaveChanges();
+                Console.WriteLine("Data saved!");
             }
 
             return new ObjectResult(new { StatusCode = 200, Value = body.GetProperty("inserted") });
