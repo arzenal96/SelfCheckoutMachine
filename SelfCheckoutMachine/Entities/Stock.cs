@@ -2,6 +2,8 @@
 {
     public class Stock
     {
-        public Bill[] Inserted { get; set; }
+        public int Id { get; set; }
+        public int BillId { get; set; }
+        public int Amount { get; set; }
     }
 }
