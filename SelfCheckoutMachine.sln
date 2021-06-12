@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfCheckoutMachine", "SelfCheckoutMachine\SelfCheckoutMachine.csproj", "{AED7AE74-F215-433A-A0D6-438249DD788A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AED7AE74-F215-433A-A0D6-438249DD788A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AED7AE74-F215-433A-A0D6-438249DD788A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AED7AE74-F215-433A-A0D6-438249DD788A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AED7AE74-F215-433A-A0D6-438249DD788A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6EFEFDEB-2C7A-487B-A269-0D59A1A078C3}
+	EndGlobalSection
+EndGlobal
