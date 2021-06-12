@@ -20,41 +20,29 @@ namespace SelfCheckoutMachine.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Stock> Get()
+        public JsonResult Get([FromBody] JsonElement body)
         {
-            throw new NotImplementedException();
+            JsonElement inserted;
+
+            var jsonResult = ErrorHandler(body, out inserted);
+            if (jsonResult != null)
+            {
+                return jsonResult;
+            }
+
+            return new JsonResult(new { StatusCode = 200, Value =  body.GetProperty("inserted") });
         }
 
         [HttpPost]
         public JsonResult Post([FromBody] JsonElement body)
         {
             JsonElement inserted;
-            
-            if (!body.TryGetProperty("inserted", out inserted))
+
+            var jsonResult = ErrorHandler(body, out inserted);
+            if (jsonResult != null)
             {
-                return new JsonResult(new { StatusCode = 422, Value = "Missing request entity: \"inserted\"" });
+                return jsonResult;
             }
-
-            var insertedBills = inserted.EnumerateObject();
-
-            bool billQuantityIsNotAnInteger = insertedBills.Any(ib => !int.TryParse(ib.Value.ToString(), out _));
-            if (billQuantityIsNotAnInteger)
-            {
-                var invalidBills = insertedBills.Where(ib => !int.TryParse(ib.Value.ToString(), out _));
-                var messageParameter = String.Join(',', invalidBills.Select(ib => ib.Name).ToArray());
-
-                return new JsonResult(new { StatusCode = 422, Value = $"The following bills type's value is invalid, it must be a number: {messageParameter}" });
-            }
-
-            bool billIsNotSupported = insertedBills.Any(ib => _context.Bills.All(b => b.BillName != ib.Name));
-            if (billIsNotSupported)
-            {
-                var unsupportedBills = insertedBills.Where(ib => _context.Bills.All(b => b.BillName != ib.Name));
-                var messageParameter = String.Join(',', unsupportedBills.Select(ub => ub.Name).ToArray());
-
-                return new JsonResult(new { StatusCode = 422, Value = $"The following bill type is not supported by the machine: {messageParameter}"});
-            }
-
 
             foreach (var bill in inserted.EnumerateObject())
             {
@@ -80,7 +68,37 @@ namespace SelfCheckoutMachine.Controllers
                 _context.SaveChanges();
             }
 
-            return new JsonResult(new { StatusCode = 200, Value = body });
+            return new JsonResult(new { StatusCode = 200, Value = body.GetProperty("inserted") });
+        }
+
+        private JsonResult ErrorHandler(JsonElement body, out JsonElement inserted)
+        {
+            if (!body.TryGetProperty("inserted", out inserted))
+            {
+                return new JsonResult(new { StatusCode = 422, Value = "Missing request entity: \"inserted\"" });
+            }
+
+            var insertedBills = inserted.EnumerateObject();
+
+            bool billQuantityIsNotAnInteger = insertedBills.Any(ib => !int.TryParse(ib.Value.ToString(), out _));
+            if (billQuantityIsNotAnInteger)
+            {
+                var invalidBills = insertedBills.Where(ib => !int.TryParse(ib.Value.ToString(), out _));
+                var messageParameter = String.Join(',', invalidBills.Select(ib => ib.Name).ToArray());
+
+                return new JsonResult(new { StatusCode = 422, Value = $"The following bills type's value is invalid, it must be a number: {messageParameter}" });
+            }
+
+            bool billIsNotSupported = insertedBills.Any(ib => _context.Bills.All(b => b.BillName != ib.Name));
+            if (billIsNotSupported)
+            {
+                var unsupportedBills = insertedBills.Where(ib => _context.Bills.All(b => b.BillName != ib.Name));
+                var messageParameter = String.Join(',', unsupportedBills.Select(ub => ub.Name).ToArray());
+
+                return new JsonResult(new { StatusCode = 422, Value = $"The following bill type is not supported by the machine: {messageParameter}" });
+            }
+
+            return null;
         }
     }
 }
