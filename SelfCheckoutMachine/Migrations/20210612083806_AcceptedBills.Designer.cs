@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SelfCheckoutMachine.Migrations;
 
 namespace SelfCheckoutMachine.Migrations
 {
     [DbContext(typeof(SelfCheckoutMachineContext))]
-    partial class SelfCheckoutMachineContextModelSnapshot : ModelSnapshot
+    [Migration("20210612083806_AcceptedBills")]
+    partial class AcceptedBills
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,9 +26,6 @@ namespace SelfCheckoutMachine.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
 
                     b.Property<string>("BillName")
                         .HasColumnType("nvarchar(max)");
@@ -42,9 +41,6 @@ namespace SelfCheckoutMachine.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
 
                     b.Property<int>("BillId")
                         .HasColumnType("int");
